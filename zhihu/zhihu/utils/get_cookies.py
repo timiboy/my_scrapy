@@ -10,7 +10,15 @@ from hashlib import sha1
 import hmac
 from requests_toolbelt import MultipartEncoder
 
-base_headers = {
+# 账户列表， 为防止对爬虫的限制， 一般来说需要多个帐号
+ZHIHU_ACCOUNT = [
+    {'username':'1', 'password':'1'},
+    {'username':'2', 'password':'2'},
+]
+
+
+# 基础headers
+BASE_HEADERS = {
             "Origin": "https://www.zhihu.com",
             "Accept-Language": "zh-CN,zh;q=0.9",
             "Accept-Encoding": "gzip, deflate, br",
@@ -29,7 +37,7 @@ class ZhihuLogin():
         self.username = username
         self.password = password
         self.session = requests.Session()
-        self.headers = base_headers.copy()
+        self.headers = BASE_HEADERS.copy()
         self.formdata = ''
 
     def _prelogin(self):
@@ -94,15 +102,29 @@ class ZhihuLogin():
         url = 'https://www.zhihu.com/api/v3/oauth/sign_in'
         formdata = self._get_formdata()
         self.formdata = self._format_formdata(data=formdata)
-        self.session.get('https://www.zhihu.com/api/v3/oauth/captcha?lang=en', headers=self.headers) # 正式登陆前用相同的请求头访问验证码接口
+        retry = True
+        while retry:
+            resp = self.session.get('https://www.zhihu.com/api/v3/oauth/captcha?lang=en', headers=self.headers) # 正式登陆前用相同的请求头访问验证码接口
+            print resp.text
+            if not json.loads(resp.text).get('show_captcha', True):
+                retry = False
+            time.sleep(0.5)
         resp = self.session.post(url, headers=self.headers, data=self.formdata)
         print resp.text
 
     def get_cookies(self):
         self._login()
-        return self.session.cookies
+        return self.session.cookies.get_dict()
 
+def get_cookies():
+    cookies = []
+    for each in ZHIHU_ACCOUNT:
+        username = each.get('username')
+        password = each.get('password')
+        loginer = ZhihuLogin(username, password)
+        cookies.append(loginer.get_cookies())
 
+COOKIES_LIST = get_cookies()
 
 if __name__ == '__main__':
     loginer = ZhihuLogin('123', '123')
