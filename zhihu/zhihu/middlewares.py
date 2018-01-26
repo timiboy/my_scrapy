@@ -6,6 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+import random
+
+from utils.get_cookies import COOKIES_LIST
 
 
 class ZhihuSpiderMiddleware(object):
@@ -101,3 +104,16 @@ class ZhihuDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+class CookiesMiddleware():
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        middleware.cookies = COOKIES_LIST
+
+    def process_request(self, request, spider):
+        request.cookies = random.choice(self.cookies)
+
+
+
+
