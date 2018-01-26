@@ -9,6 +9,7 @@ from scrapy import signals
 import random
 
 from utils.get_cookies import COOKIES_LIST
+from utils.get_proxy import PROXIES_LIST
 
 
 class ZhihuSpiderMiddleware(object):
@@ -113,6 +114,16 @@ class CookiesMiddleware():
 
     def process_request(self, request, spider):
         request.cookies = random.choice(self.cookies)
+
+class ProxyMiddleware():
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        middleware.proxies = PROXIES_LIST
+
+    def process_request(self, request, spider):
+        request.meta['proxy'] = random.choice(self.proxies)
+
 
 
 

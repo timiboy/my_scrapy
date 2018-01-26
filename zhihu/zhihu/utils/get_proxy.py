@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
 
-PROXY_LIST = []
+PROXIES_LIST = [
+    'http://YOUR_PROXY_IP:PORT'
+]
 
