@@ -12,8 +12,8 @@ from requests_toolbelt import MultipartEncoder
 
 # 账户列表， 为防止对爬虫的限制， 一般来说需要多个帐号
 ZHIHU_ACCOUNT = [
-    {'username':'1', 'password':'1'},
-    {'username':'2', 'password':'2'},
+    {'username':'123', 'password':'123'},
+    # {'username':'2', 'password':'2'},
 ]
 
 
@@ -63,6 +63,7 @@ class ZhihuLogin():
         xsrf, udid = self._get_auth_data(text)
         self.headers['X-Xsrftoken'] = xsrf
         self.headers['X-UDID'] = udid
+        self.udid = udid
 
     def _get_timestamp(self):
         return str(long(time.time() * 1000))
@@ -112,23 +113,24 @@ class ZhihuLogin():
         resp = self.session.post(url, headers=self.headers, data=self.formdata)
         print resp.text
 
+
     def get_cookies(self):
         self._login()
-        return self.session.cookies.get_dict()
+        self.cookies = self.session.cookies.get_dict()
+        self.zc_0 = self.cookies.get('z_c0')
 
 def get_cookies():
     cookies = []
     for each in ZHIHU_ACCOUNT:
         username = each.get('username')
         password = each.get('password')
-        loginer = ZhihuLogin(username, password)
-        cookies.append(loginer.get_cookies())
+        l = ZhihuLogin(username, password)
+        l.get_cookies()
+        cookies.append(l)
+    return cookies
+
 
 COOKIES_LIST = get_cookies()
 
 if __name__ == '__main__':
-    loginer = ZhihuLogin('123', '123')
-    # data = loginer._get_formdata()
-    # print loginer._format_formdata(data)
-    print loginer.get_cookies()
-
+    pass

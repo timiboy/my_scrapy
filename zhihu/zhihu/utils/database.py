@@ -3,6 +3,7 @@
 from my_logger import MyLogger
 
 import traceback
+import pymongo
 import redis
 import pymysql
 from pymysql.err import InterfaceError, IntegrityError
@@ -11,6 +12,8 @@ from pymysql.err import InterfaceError, IntegrityError
 
 
 redis_handler = redis.Redis(host='localhost', port=6379, db=0)
+mongo_handler = pymongo.MongoClient(host='localhost', port=27017)
+
 
 class MysqlHandler():
     def __init__(self, host='http://127.0.0.1', user='root', password='123', database='zhihu'):
@@ -33,7 +36,8 @@ class MysqlHandler():
             return False
 
         if exc_type == InterfaceError:
-            self.logger.log(msg=u'与数据库的连接断开了')
+            msg = '\n'.join(traceback.format_exception(exc_type, exc_val, exc_tb))
+            self.logger.log(msg=msg)
             self.conn.rollback()
             self.conn = pymysql .conncet(host=self.host, user=self.user, password=self.password, database=self.database, charset='utf-8')
         else:
@@ -46,4 +50,3 @@ class MysqlHandler():
         self.cur.close()
         self.conn.close()
 
-        

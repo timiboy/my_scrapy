@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'zhihu.spiders'
 #USER_AGENT = 'zhihu (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -55,6 +55,13 @@ ROBOTSTXT_OBEY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    'zhihu.middlewares.ZhihuDownloaderMiddleware': 543,
 #}
+DOWNLOADER_MIDDLEWARES = {
+    # 'zhihu.middlewares.CookiesMiddleware':110,
+    'zhihu.middlewares.HeadersMiddleware':120,
+    # 'zhihu.middlewares.ZhihuDownloaderMiddleware': 543,
+}
+
+
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

@@ -111,18 +111,25 @@ class CookiesMiddleware():
     def from_crawler(cls, crawler):
         middleware = cls()
         middleware.cookies = COOKIES_LIST
+        return middleware
 
     def process_request(self, request, spider):
-        request.cookies = random.choice(self.cookies)
+        request.cookies.update(random.choice(self.cookies))
 
 class ProxyMiddleware():
     @classmethod
     def from_crawler(cls, crawler):
         middleware = cls()
         middleware.proxies = PROXIES_LIST
+        return middleware
 
     def process_request(self, request, spider):
         request.meta['proxy'] = random.choice(self.proxies)
+
+class HeadersMiddleware():
+    def process_request(self, request, spider):
+        request.headers['User-Agent'] = \
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'
 
 
 
