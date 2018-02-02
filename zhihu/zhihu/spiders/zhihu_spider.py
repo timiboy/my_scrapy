@@ -18,7 +18,7 @@ class ZhihuSpider(Spider):
     ]
     cookie = random.choice(COOKIES_LIST)
     profile_url = 'https://www.zhihu.com/api/v4/members/%s?include=allow_message,is_followed,is_following,is_org,is_blocking,employments,answer_count,follower_count,articles_count,gender,badge[?(type=best_answerer)].topics'
-    following_url = 'https://www.zhihu.com/api/v4/members/%s/followees?include=data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics&offset=120&limit=20'
+    following_url = 'https://www.zhihu.com/api/v4/members/%s/followees?include=data[*].answer_count,articles_count,gender,follower_count,is_followed,is_following,badge[?(type=best_answerer)].topics&offset=0&limit=20'
 
     def __init__(self, *args, **kwargs):
         super(ZhihuSpider, self).__init__(*args, **kwargs)
@@ -58,8 +58,5 @@ class ZhihuSpider(Spider):
                 yield Request(self.profile_url % username, callback=self.profile_parse, headers=self.headers, \
                               cookies=self.cookie.cookies, meta={'username':username})
         if not users.get('paging', {}).get('is_end', True):
-            print '==============================='
-            print u'下一个'
-            print '==============================='
             next_page = users.get('paging', {}).get('next', '')
             yield Request(next_page, callback=self.following_parse, headers=self.headers, cookies=self.cookie.cookies)
