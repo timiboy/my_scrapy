@@ -22,6 +22,7 @@ class ZhihuSpider(Spider):
 
     def __init__(self, *args, **kwargs):
         super(ZhihuSpider, self).__init__(*args, **kwargs)
+        self.username_set = set()
         self.headers = {
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding':'gzip, deflate, sdch',
@@ -43,6 +44,7 @@ class ZhihuSpider(Spider):
     def profile_parse(self, response):
         profile = response.body
         username = response.meta['username']
+        self.username_set.add(username)
         mongo_handler.db.zhihu_profile.update({'url_token':username}, json.loads(profile), True, True)
         return Request(self.following_url % username, callback=self.following_parse, headers=self.headers, \
                        cookies=self.cookie.cookies)
@@ -52,6 +54,6 @@ class ZhihuSpider(Spider):
         for each in users.get('data', []):
             time.sleep(0.5)
             username = each.get('url_token', '')
-            if username:
+            if username and username not in self.username_set:
                 yield Request(self.profile_url % username, callback=self.profile_parse, headers=self.headers, \
                               cookies=self.cookie.cookies, meta={'username':username})
